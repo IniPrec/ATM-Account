@@ -37,6 +37,29 @@ namespace ATM_Account
             phoneNumber = Console.ReadLine();
             Console.WriteLine();
 
+            do
+            {
+                Console.Write("password: ");
+                password = Console.ReadLine();
+                Console.WriteLine();
+
+                if (password.Length < 8 || password.Length > 16)
+                {
+                    Console.WriteLine("Password must be between 8 and 16!");
+                }
+            } while (password.Length < 8 || password.Length > 16);
+
+            string confirmPassword;
+            do
+            {
+                Console.Write("Confirm password: ");
+                confirmPassword = Console.ReadLine();
+
+                if (confirmPassword != password)
+                {
+                    Console.WriteLine("Passwords do not match!");
+                }
+            } while (confirmPassword != password);
         }
     }
 }
