@@ -31,7 +31,7 @@ namespace ATM_Account
             {
                 do
                 {
-                    Console.WriteLine("Password: ");
+                    Console.Write("Password: ");
                     checkPassword = Console.ReadLine();
                     Console.WriteLine();
 

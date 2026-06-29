@@ -37,7 +37,7 @@ namespace ATM_Account
             {
                 do
                 {
-                    Console.WriteLine("1. New User\n2. Existing User\n3. Exit. (Enter 1, 2 or 3)");
+                    Console.WriteLine("1. New User (Register)\n2. Existing User(Log in)\n3. Exit. (Enter 1, 2 or 3)");
                     Console.WriteLine();
 
                     string choiceInput = Console.ReadLine();

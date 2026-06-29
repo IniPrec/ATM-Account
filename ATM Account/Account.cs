@@ -66,10 +66,10 @@ namespace ATM_Account
 
         public bool Deposit(User user)
         {
+            double depositAmount = GetValidAmount("Enter amount to deposit: ");
+
             if (auth.VerifyUser(user))
             {
-                double depositAmount;
-                depositAmount = GetValidAmount("Enter amount to deposit: ");
                 Balance += depositAmount;
                 Console.WriteLine("Deposit Successful.");
                 Console.WriteLine();
@@ -86,17 +86,11 @@ namespace ATM_Account
 
         public bool Withdraw(User user)
         {
-            double withdrawAmount;
+            double withdrawAmount = BalanceChecker("Enter amount to withdraw: ");
+            if (withdrawAmount == -1) return false;
 
             if (auth.VerifyUser(user))
             {
-                withdrawAmount = BalanceChecker("Enter amount to withdraw: ");
-
-                if (withdrawAmount == -1)
-                {
-                    return false;
-                }
-
                 Balance -= withdrawAmount;
                 Console.WriteLine("Withdrawal Successful!");
                 Console.WriteLine();
@@ -114,41 +108,37 @@ namespace ATM_Account
             AccountServices accountServices = new AccountServices();
             Account recipient;
 
-            if (auth.VerifyUser(user))
+            do
             {
-                do
+                Console.Write("Enter the recipient's account number: ");
+                string transferAccountInput = Console.ReadLine();
+                isAccountValid = long.TryParse(transferAccountInput, out transferToAccount);
+                recipient = accountServices.GetAccountByAccountNumber(transferToAccount);
+
+                if (!isAccountValid)
                 {
-                    Console.Write("Enter the recipient's account number: ");
-                    string transferAccountInput = Console.ReadLine();
-                    isAccountValid = long.TryParse(transferAccountInput, out transferToAccount);
-                    recipient = accountServices.GetAccountByAccountNumber(transferToAccount);
-
-                    if (!isAccountValid)
-                    {
-                        Console.WriteLine("Invalid input! Please enter a number.");
-                        Console.WriteLine();
-                    }
-
-                    if (transferToAccount.ToString().Length != 10)
-                    {
-                        Console.WriteLine("Enter a valid account number!");
-                        Console.WriteLine();
-                    }
-
-                    if (recipient == null)
-                    {
-                        Console.WriteLine("Recipient's Account not found");
-                        Console.WriteLine();
-                    }
-                } while (!isAccountValid || transferToAccount.ToString().Length != 10 || recipient == null);
-
-                transferAmount = BalanceChecker("Enter amount to transfer: ");
-
-                if (transferAmount == -1)
-                {
-                    return false;
+                    Console.WriteLine("Invalid input! Please enter a number.");
+                    Console.WriteLine();
                 }
 
+                if (transferToAccount.ToString().Length != 10)
+                {
+                    Console.WriteLine("Enter a valid account number!");
+                    Console.WriteLine();
+                }
+
+                if (recipient == null)
+                {
+                    Console.WriteLine("Recipient's Account not found");
+                    Console.WriteLine();
+                }
+            } while (!isAccountValid || transferToAccount.ToString().Length != 10 || recipient == null);
+
+            transferAmount = BalanceChecker("Enter amount to transfer: ");
+            if (transferAmount == -1) return false;
+
+            if (auth.VerifyUser(user))
+            {
                 Balance -= transferAmount;
                 recipient.Deposit(transferAmount);
                 accountServices.UpdateAccount(recipient);
