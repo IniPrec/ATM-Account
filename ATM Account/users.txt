@@ -1,0 +1,6 @@
+inioluwa,7b7a8538-0bc6-4861-b813-0588cbcb056f,Precious,Oyebanjo,omoprepre67@gmail.com,09023665308,olasunmbo27,3980,29/06/2026 07:57:03
+Adelaja,7b7a8538-0bc6-4861-b813-0588cbcb056f,Peter,Oyebanjo,adelaja77@gmail.com,07036099616,zion2027,2177,29/06/2026 07:57:03
+Bridgerton,5093a2b5-be4a-4646-89d7-415e61d4359d,John Dawson,Bridge,johndawson90@gmail.com,09077886565,dawsongenry,4565,29/06/2026 08:06:44
+bridgerton,5093a2b5-be4a-4646-89d7-415e61d4359d,Precious Dawson,Bridge,preciousdawson78@gmail.com,08076764543,bridgenry,3456,29/06/2026 08:06:44
+janesmith,d471a8be-7ae7-49c9-905b-2efa8f77c82e,Jane ,Smith,janesmith@gmail.com,08087654321,Jane5678!,5678,29/06/2026 08:16:50
+johndoe,f13014e7-f662-4813-bf5e-b1e8e91f9f1f,John,Doe,johndoe@gmail.com,08012345678,John1234,1234,29/06/2026 08:18:39

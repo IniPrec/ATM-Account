@@ -7,105 +7,169 @@ namespace ATM_Account
     class Account
     {
         public long AccountNumber { get; }
-        public double Balance { get; set; }
-        public Guid UserId { get; }
+        public double Balance { get; private set; }
+        public Guid UserId { get; set; }
+
+        public Account(long accountNumber, double balance)
+        {
+            AccountNumber = accountNumber;
+            Balance = balance;
+        }
 
         public Account()
         {
             Random random = new Random();
             AccountNumber = random.NextInt64(1000000000, 9999999999);
+            Balance = 0;
         }
 
         private double GetValidAmount(string prompt)
         {
-            double inputAmount;
+            double amount;
             bool isValid;
 
             do
             {
                 Console.Write(prompt);
                 string input = Console.ReadLine();
-                isValid = double.TryParse(input, out inputAmount);
+                isValid = double.TryParse(input, out amount);
 
                 if (!isValid)
                 {
                     Console.WriteLine("Input must be numbers only.");
                 }
 
-                if (inputAmount < 0)
+                if (amount < 0)
                 {
                     Console.WriteLine("Amount must be greater than 0.");
                 }
-            } while (!isValid || inputAmount < 0);
 
-            return inputAmount;
+            } while (!isValid || amount < 0);
+
+            return amount;
         }
 
         private double BalanceChecker(string prompt)
         {
-            double inputAmount;
+            double amount = GetValidAmount(prompt);
 
-            do
+            if (amount > Balance)
             {
-                inputAmount = GetValidAmount(prompt);
-                if (inputAmount > Balance)
-                {
-                    Console.WriteLine("Insufficient funds.");
-                }
-            } while (inputAmount > Balance);
+                Console.WriteLine("Insufficient funds!");
+                return -1;
+            }
 
-            return inputAmount;
+            return amount;
         }
 
-        public void Deposit()
+        AuthServices auth = new AuthServices();
+
+        public bool Deposit(User user)
         {
-            double depositAmount;
+            if (auth.VerifyUser(user))
+            {
+                double depositAmount;
+                depositAmount = GetValidAmount("Enter amount to deposit: ");
+                Balance += depositAmount;
+                Console.WriteLine("Deposit Successful.");
+                Console.WriteLine();
+                return true;
+            }
 
-            depositAmount = GetValidAmount("Enter amount to deposit: ");
-            Balance += depositAmount;
-            Console.WriteLine("Deposit Successful!");
+            return false;
         }
 
-        public void Withdraw()
+        public void Deposit(double amount)
+        {
+            Balance += amount;
+        }
+
+        public bool Withdraw(User user)
         {
             double withdrawAmount;
 
-            withdrawAmount = BalanceChecker("Enter amount to withdraw: ");
-            Balance -= withdrawAmount;
-            Console.WriteLine("Withdrawal Successful!");
+            if (auth.VerifyUser(user))
+            {
+                withdrawAmount = BalanceChecker("Enter amount to withdraw: ");
+
+                if (withdrawAmount == -1)
+                {
+                    return false;
+                }
+
+                Balance -= withdrawAmount;
+                Console.WriteLine("Withdrawal Successful!");
+                Console.WriteLine();
+                return true;
+            }
+
+            return false;
         }
 
-        public void Transfer()
+        public bool Transfer(User user)
         {
             double transferAmount;
             long transferToAccount;
             bool isAccountValid;
+            AccountServices accountServices = new AccountServices();
+            Account recipient;
 
-            do
+            if (auth.VerifyUser(user))
             {
-                Console.Write("Enter the recipient's account number: ");
-                string transferAccountInput = Console.ReadLine();
-                isAccountValid = long.TryParse(transferAccountInput, out transferToAccount);
-
-                if (!isAccountValid)
+                do
                 {
-                    Console.WriteLine("Invalid Input! Please enter a number.");
+                    Console.Write("Enter the recipient's account number: ");
+                    string transferAccountInput = Console.ReadLine();
+                    isAccountValid = long.TryParse(transferAccountInput, out transferToAccount);
+                    recipient = accountServices.GetAccountByAccountNumber(transferToAccount);
+
+                    if (!isAccountValid)
+                    {
+                        Console.WriteLine("Invalid input! Please enter a number.");
+                        Console.WriteLine();
+                    }
+
+                    if (transferToAccount.ToString().Length != 10)
+                    {
+                        Console.WriteLine("Enter a valid account number!");
+                        Console.WriteLine();
+                    }
+
+                    if (recipient == null)
+                    {
+                        Console.WriteLine("Recipient's Account not found");
+                        Console.WriteLine();
+                    }
+                } while (!isAccountValid || transferToAccount.ToString().Length != 10 || recipient == null);
+
+                transferAmount = BalanceChecker("Enter amount to transfer: ");
+
+                if (transferAmount == -1)
+                {
+                    return false;
                 }
 
-                if (transferToAccount.ToString().Length != 10)
-                {
-                    Console.WriteLine("Enter a valid account number!");
-                }
-            } while (!isAccountValid || transferToAccount.ToString().Length != 10);
+                Balance -= transferAmount;
+                recipient.Deposit(transferAmount);
+                accountServices.UpdateAccount(recipient);
+                Console.WriteLine("Transfer Successful!");
+                Console.WriteLine();
+                return true;
+            }
 
-            transferAmount = BalanceChecker("Enter amount to transfer: ");
-            Balance -= transferAmount;
-            Console.WriteLine("Transaction Successful");
+            return false;
         }
 
-        public void CheckBalance()
+        public bool CheckBalance(User user)
         {
-            Console.WriteLine($"Your balance is {Balance}");
+            if (auth.VerifyUser(user))
+            {
+                Console.WriteLine($"Your balance is {Balance:C}");
+                Console.WriteLine();
+                return true;
+            }
+
+            return false;
         }
     }
 }
